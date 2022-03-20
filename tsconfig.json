@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "ESNext", // required
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "importHelpers": true, // required
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist"
+  },
+  "lib": ["es2020","dom","esnext"]
+}
