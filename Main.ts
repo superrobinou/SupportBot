@@ -33,7 +33,7 @@ async function start(){
     new ChannelClose();
     new ChannnelPanel();
     new OnSupportOpen();
-    client.login('OTUyOTEyMzAzMjkwOTg2NTA2.Yi86vQ.dnPoraRnqW169r6JYWTwHzG_Ysg');
+    client.login('BOT_TOKEN');
 }
 export var DB = level("jambon");
 start();
