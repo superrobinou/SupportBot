@@ -1,39 +1,50 @@
 import "reflect-metadata";
-import {Client, On} from 'discordx';
-import { Intents } from 'discord.js';
+import path, { dirname } from "path";
+import {Client} from 'discordx';
+import { Intents, Message } from 'discord.js';
 import level from "level";
-import ChannnelAddRemove from "./commands/channeladdremove.js";
-import ChannnelName from './commands/channelname.js';
-import ChannelClose from './commands/channelclose.js';
-import ChannnelPanel from './commands/channelpanel.js';
-import OnSupportOpen from './commands/onsupportopen.js';
+import dotenv from 'dotenv';
+import { fileURLToPath } from "url";
+import { importx } from "@discordx/importer";
+
+export const client=new Client({
+    simpleCommand: {
+        prefix: "s!",
+    },
+    intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MEMBERS,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        Intents.FLAGS.GUILD_VOICE_STATES,
+    ],
+    botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
+    silent: false
+});
+client.once("ready", async () => {
+    // to create/update/delete discord application commands
+    await client.guilds.fetch();
+    await client.initApplicationCommands({ global: { log: true }, guild: { log: true } });
+    await client.initApplicationPermissions(true);
+    console.log("Bot started");
+});
+client.on('interactionCreate', async interaction => {
+    console.log(interaction);
+    client.executeInteraction(interaction);
+});
+client.on("messageCreate", (message: Message) => {
+    client.executeCommand(message);
+});
 async function start(){
-    const client = new Client({
-        intents: [
-            Intents.FLAGS.GUILDS,
-            Intents.FLAGS.GUILD_MESSAGES,
-            Intents.FLAGS.GUILD_MEMBERS,
-        ],
-        silent: false
-    });
-
-    client.once("ready", async () => {
-        console.log(">> Bot started");
-
-        // to create/update/delete discord application commands
-        await client.initApplicationCommands({ global: { log: true }, guild: { log: true } });
-        await client.initApplicationPermissions(true);
-    });
-
-    client.on('interactionCreate', async interaction => {
-        client.executeInteraction(interaction);
-    });
-    new ChannnelAddRemove();
-    new ChannnelName();
-    new ChannelClose();
-    new ChannnelPanel();
-    new OnSupportOpen();
-    client.login('BOT_TOKEN');
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const folder = path.resolve(__dirname, '..');
+    dotenv.config({ path: folder + '/globals.env' });
+    console.log('chargement de configuration: ' + folder);
+    var BOT_TOKEN = process.env.BOT_TOKEN;
+    console.log(BOT_TOKEN);
+    await importx(__dirname + "/commands/*.{ts,js}");
+    client.login(BOT_TOKEN);
 }
-export var DB = level("jambon");
+
 start();

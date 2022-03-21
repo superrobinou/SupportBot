@@ -2,62 +2,54 @@
 
 import { CacheType, CommandInteraction} from 'discord.js';
 import { Discord, Slash, SlashChoice, SlashOption } from 'discordx';
-import errors from 'level-errors';
-import { DB } from '../Main.js';
+import { Model } from '../models/models.js';
 @Discord()
  class ChannnelAddRemove{
 
     @Slash('cm')
     async execute(@SlashChoice("add","add") @SlashChoice("remove","remove") @SlashOption("state")state:string,@SlashOption("number",{type:"INTEGER",description:"number",minValue:1,required:true}) number:number,interaction:CommandInteraction<CacheType>) {
-        var name:string='support';
-        var lastchannel:number=1;
-        try{
-            name = await DB.get('name');
+        const model:Model=new Model();
+        var libre=await model.getLibre();
+        var occupe =await model.getOccupe();
+        if (libre==""){
+            var test=await interaction.guild.channels.create('occupé',{type:'GUILD_CATEGORY',reason:'libre'});
+            libre=test.parentId;
         }
-        catch(err){
-            if(err instanceof errors.NotFoundError){
-
-            }
-            else{
-                console.log(err);
-            }
+        model.putLibre(libre);
+        if(occupe==""){
+            var test2 = await interaction.guild.channels.create('occupé', { type: 'GUILD_CATEGORY', reason: 'occupé' });
+            occupe=test2.parentId;
         }
-       try{
-        lastchannel = await DB.get('LastChannel');
-       }
-       catch(err){
-        if(err instanceof errors.NotFoundError){
-
-        }
-        else{
-            console.log(err);
-        }
-       }
-        var newLastchannel=0;
-        console.log(state);
-        if(state=="add"){
-            newLastchannel = lastchannel + number;
-            for (var i = lastchannel; i <= lastchannel + number; i++){
-                await interaction.guild.channels.create(name+i, { type: 'GUILD_TEXT', reason: 'support needed' });
-                DB.put('channel'+i,'true');
-            }
-            DB.put('LastChannel',newLastchannel);
-
-        }
-        else{
-            newLastchannel = lastchannel - number;
-            if(newLastchannel>0){
-                for (var i = lastchannel; i <= lastchannel + number;i--) {
-                    const channel=interaction.guild.channels.cache.find(r=>r.name===name+i);
-                    channel.delete();
-                    DB.del('channel'+i);
+        model.PutOccupe(occupe);
+        var name:string=await model.getName(false,interaction);
+            var lastchannel: number = await model.getLastChannel(false,interaction);
+            var newLastchannel = 0;
+            console.log(state);
+            if (state == "add") {
+                newLastchannel = lastchannel + number;
+                for (var i = lastchannel; i <= lastchannel + number; i++) {
+                    await interaction.guild.channels.create(name + i, { type: 'GUILD_TEXT', reason: 'support needed', permissionOverwrites: 
+                    [{id:interaction.guild.roles.everyone,deny:['SEND_MESSAGES']}],parent:libre });
+                   model.putChannel(i);
                 }
-                DB.put('LastChannel', newLastchannel);
-            }
+                model.putLastChannel(newLastchannel);
 
+            }
+            else {
+                newLastchannel = lastchannel - number;
+                if (newLastchannel > 0) {
+                    for (var i = lastchannel; i <= lastchannel + number; i--) {
+                        const channel = interaction.guild.channels.cache.find(r => r.name === name + i);
+                        channel.delete();
+                        model.deleteChannel(i);
+                    }
+                    model.putLastChannel(newLastchannel);
+
+            }
+            interaction.reply('channel crée/supprimé!');
+            return true;
         }
-        interaction.reply('channel crée/supprimé!');
-        return true;
+     
     }
 }
 
