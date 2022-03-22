@@ -17,6 +17,9 @@ export const client=new Client({
         Intents.FLAGS.GUILD_MEMBERS,
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
         Intents.FLAGS.GUILD_VOICE_STATES,
+        Intents.FLAGS.DIRECT_MESSAGES,
+        Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
+        Intents.FLAGS.DIRECT_MESSAGE_TYPING
     ],
     botGuilds: [(client) => client.guilds.cache.map((guild) => guild.id)],
     silent: false
@@ -29,7 +32,6 @@ client.once("ready", async () => {
     console.log("Bot started");
 });
 client.on('interactionCreate', async interaction => {
-    console.log(interaction);
     client.executeInteraction(interaction);
 });
 client.on("messageCreate", (message: Message) => {

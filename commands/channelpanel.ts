@@ -11,7 +11,7 @@ class ChannnelPanel{
         if(lastchannel!=-1){
             for (var i = 1; i <= lastchannel;i++) {
                 var channel = await model.getIsOpen(false,i,null);
-                if (channel === true) {
+                if (channel == true) {
                     openChannels.push(i);
                 }
         }
@@ -22,10 +22,6 @@ class ChannnelPanel{
     @Slash('channelpanel')
     async execute(@SlashOption('channel', { type: 'CHANNEL', description: 'channel', required: true }) channel:Channel,interaction: CommandInteraction<CacheType>) {
         var model:Model=new Model();
-        var messageId:Message=await model.getMessageId();
-        if(messageId!=null){
-            await messageId.delete();
-        }
             const panel = new MessageButton().setCustomId('panel').setLabel('Support').setStyle('PRIMARY');
             const row = new MessageActionRow().addComponents(panel);
 
@@ -47,12 +43,15 @@ class ChannnelPanel{
     async Button(interaction: ButtonInteraction) {
         const model=new Model();
         var channels = await this.checkOpenChannel();
+        console.log(channels);
         if (channels.length != 0) {
             interaction.reply('regardez vos dm');
-            var test = await interaction.user.send('1');
-            var setup = await test.awaitMessageComponent({ time: 1500 });
-            var test2 = await setup.user.send('2');
-            var descriptionProbleme = await test2.awaitMessageComponent({ time: 1500 });
+            var dmChannel =await interaction.user.createDM();
+            await dmChannel.send('1');
+            var setup = (await dmChannel.awaitMessages({ filter: (m => m.author.id == interaction.user.id), max: 1})).first();
+            await setup.reply('2');
+            var descriptionProbleme = (await dmChannel.awaitMessages({ filter: (m => m.author.id == interaction.user.id), max: 1})).first();
+
             var channels = await this.checkOpenChannel();
             if (channels.length != 0) {
                 var channel = channels[0];
@@ -63,7 +62,7 @@ class ChannnelPanel{
                     ch.send('lol');
                 }
             } else {
-                descriptionProbleme.user.send("aucun salon de support n'est libre");
+                interaction.user.send("aucun salon de support n'est libre");
             }
         }
         else {

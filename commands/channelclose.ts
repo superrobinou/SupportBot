@@ -9,12 +9,11 @@ class ChannnelClose{
         var channel = interaction.channel;
         const model=new Model();
         if (channel.isText() && channel.type=="GUILD_TEXT") {
-            var name:string=await model.getName(true,interaction);
+            var name:string=await model.getName(false,interaction);
             var lastchannel:number=await model.getLastChannel(true,interaction);
-            if(lastchannel==-1){
+            if(lastchannel!=-1){
            model.toggleChannel(lastchannel,channel,name,interaction,1);
         }
-     
         }
      
     }

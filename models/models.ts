@@ -63,8 +63,8 @@ export class Model{
         else if(state==2){
             openChannel = false;
         }
-        for (var i = 1; i++; i <= lastchannel) {
-            var isOpen = await this.getIsOpen(true,i,interaction);
+        for (var i = 1; i <= lastchannel; i++) {
+            var isOpen = await this.getIsOpen(false,i,interaction);
             if (isOpen==null){
                 Model.DB.del("channel"+i);
             }
@@ -86,30 +86,37 @@ export class Model{
 
                 Model.DB.put("channel+i", isOpen);
             }
-            if (test == false) { interaction.reply({ content: 'ce salon ne peut pas être fermé', ephemeral: true }); }
         }
+        if (test == false) { interaction.reply({ content: 'ce salon ne peut pas être fermé', ephemeral: true }); }
     }
-    async getIsOpen(isReply: boolean,i:number, interaction: CommandInteraction<CacheType>) {
-        var isOpen=false;
+    async getIsOpen(isReply: boolean,i:number, interaction: CommandInteraction<CacheType>):Promise<boolean> {
+        var test='false';
+        var open=false;
         try{
-        isOpen=await Model.DB.get("channel" + i);
+        test=await Model.DB.get("channel" + i);
         }
         catch(err){
             if (err instanceof errors.NotFoundError) {
 
                 if (isReply) {
                     interaction.reply("vous ne pouvez pas fermer de salon car le bot n'a pas été configuré");
-                    isOpen=null;
+                    test=null;
 
                 }
                 else {
-                    isOpen = null;
+                    test = null;
                     console.log(err);
                 }
                 
             }
         }
-        return isOpen;
+        if(test!=null){
+            open=test=='true';
+        }
+        else{
+            open=null;
+        }
+        return open;
     }
 
    async getName(isReply:boolean,interaction:CommandInteraction<CacheType>){
@@ -139,7 +146,7 @@ export class Model{
     async getLastChannel(isReply: boolean, interaction: CommandInteraction<CacheType>){
        var lastchannel:number=1;
        try {
-           lastchannel = await Model.DB.get('LastChannel');
+           lastchannel = await Model.DB.get('lastchannel');
        }
        catch (err) {
            if (err instanceof errors.NotFoundError) {
