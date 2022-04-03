@@ -35,7 +35,9 @@ class ChannnelPanel{
     }
     @ButtonComponent('panel')
     async Button(interaction: ButtonInteraction) {
+                //récupération des données par rapport au serveur d'ou est lancé la commande
         var root = await RootModel.findOne({ guildId: interaction.guild.id });
+        //cherche un channel et le récupére
         var channel = await this.checkOpenChannel(root);
         var roleMember = interaction.member.roles;
         var test="";

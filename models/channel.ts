@@ -1,14 +1,11 @@
-import * as typegoose from "@typegoose/typegoose";
-import { DocumentType, Ref } from '@typegoose/typegoose';
-import { Root} from "./root.js";
-const {Prop,getModelForClass} =typegoose['default']||typegoose;
+import { Prop, getModelForClass } from '@typegoose/typegoose'; //libraire pour la base de donnée
 export class ChannelSupport{
     @Prop()
-    channelId:String;
+    channelId:String; //l'identifiant du channel
     @Prop()
-    isOpen:boolean;
+    isOpen:boolean; //indique si le  channel est libre ou occupé
     @Prop()
-    demandeur:String;
+    demandeur:String; // le nom de l'utilisateur dont la demande est en cours
     constructor(channelId:String){
         this.channelId=channelId;
         this.isOpen=true;
