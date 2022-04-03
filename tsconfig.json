@@ -2,7 +2,7 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "module": "ESNext", // required
+    "module": "commonJs", // required
     "target": "ESNext",
     "esModuleInterop": true,
     "importHelpers": true, // required

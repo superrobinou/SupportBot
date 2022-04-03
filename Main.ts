@@ -1,11 +1,10 @@
 import "reflect-metadata";
-import path, { dirname } from "path";
+import path from "path";
 import {Client} from 'discordx';
 import { Intents, Message } from 'discord.js';
-import level from "level";
 import dotenv from 'dotenv';
-import { fileURLToPath } from "url";
 import { importx } from "@discordx/importer";
+import mongoose from "mongoose";
 
 export const client=new Client({
     simpleCommand: {
@@ -29,6 +28,7 @@ client.once("ready", async () => {
     await client.guilds.fetch();
     await client.initApplicationCommands({ global: { log: true }, guild: { log: true } });
     await client.initApplicationPermissions(true);
+
     console.log("Bot started");
 });
 client.on('interactionCreate', async interaction => {
@@ -38,8 +38,7 @@ client.on("messageCreate", (message: Message) => {
     client.executeCommand(message);
 });
 async function start(){
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = dirname(__filename);
+    await mongoose.connect('mongodb://127.0.0.1:27017/test');
     const folder = path.resolve(__dirname, '..');
     dotenv.config({ path: folder + '/globals.env' });
     console.log('chargement de configuration: ' + folder);
@@ -48,5 +47,6 @@ async function start(){
     await importx(__dirname + "/commands/*.{ts,js}");
     client.login(BOT_TOKEN);
 }
+
 
 start();
