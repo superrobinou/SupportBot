@@ -10,9 +10,9 @@ import { RootModel } from '../models/root';
     @Slash('cm')
     async execute(@SlashChoice("add","add") @SlashChoice("remove","remove") @SlashOption("state")state:string,@SlashOption("number",{type:"INTEGER",description:"number",minValue:1,required:true}) number:number,interaction:CommandInteraction<CacheType>) {
         if (interaction.memberPermissions.has('MANAGE_CHANNELS')) {
-        var root = await RootModel.findOne({ root: interaction.guild.id });
+        var root = await RootModel.findOne({ guildId: interaction.guild.id });
+        console.log(root);
         var libre= root.categoryLibre;
-        console.log(occupe);
         var occupe =root.categoryOccupe;
         if (libre==undefined){
             var test=await interaction.guild.channels.create('libre',{type:'GUILD_CATEGORY',reason:'libre'});
@@ -26,6 +26,8 @@ import { RootModel } from '../models/root';
             root.categoryOccupe=occupe;
         }
         var nom=root.nom;
+        console.log(libre);
+        console.log(occupe);
             var lastchannel: number = root.lastChannel;
             var newLastchannel = 0;
             console.log(state);

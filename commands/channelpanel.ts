@@ -13,7 +13,7 @@ class ChannnelPanel{
     @Slash('channelpanel')
     async execute(@SlashOption('channel', { type: 'CHANNEL', description: 'channel', required: true }) channel:Channel,interaction: CommandInteraction<CacheType>) {
         if(interaction.memberPermissions.has('MANAGE_MESSAGES')){
-        var root = await RootModel.findOne({ root: interaction.guild.id });
+        var root = await RootModel.findOne({ guildId: interaction.guild.id });
             const panel = new MessageButton().setCustomId('panel').setLabel('Support').setStyle('PRIMARY');
             const row = new MessageActionRow().addComponents(panel);
             var c = interaction.guild.channels.cache.get(channel.id);
@@ -35,7 +35,7 @@ class ChannnelPanel{
     }
     @ButtonComponent('panel')
     async Button(interaction: ButtonInteraction) {
-        var root = await RootModel.findOne({ root: interaction.guild.id });
+        var root = await RootModel.findOne({ guildId: interaction.guild.id });
         var channel = await this.checkOpenChannel(root);
         var roleMember = interaction.member.roles;
         var test="";
@@ -56,8 +56,13 @@ class ChannnelPanel{
             var channel = await this.checkOpenChannel(root);
             if (channel != null) {
                 var name = "";
+                console.log(channel);
                 var ch = interaction.guild.channels.cache.find(c => c.id == channel.channelId);
                 if (ch.isText() && ch.type == "GUILD_TEXT") {
+                    channel.isOpen=false;
+                    var index=root.channels.indexOf(channel);
+                    root.channels[index]=channel;
+                    root.save();
                     ch.permissionOverwrites.edit(ch.guild.roles.everyone, { SEND_MESSAGES: true });
                     ch.setParent(root.categoryOccupe);
                     var embed=new MessageEmbed().setColor('DARK_BLUE').setTitle('support demandé').setDescription('support demandé par '+'<@'+interaction.user+">")

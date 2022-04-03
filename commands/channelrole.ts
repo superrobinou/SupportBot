@@ -7,7 +7,7 @@ export class ChannelRole{
     @Slash('channelrole')
     async execute(@SlashOption('roledemandeur', { type: 'ROLE', description: 'role', required: true }) roleDemandeur: Role, @SlashOption('rolesupport', { type: 'ROLE', description: 'role', required: true }) roleSupport: Role,interaction: CommandInteraction<CacheType>){
         if(interaction.memberPermissions.has('MANAGE_ROLES')){
-        var root = await RootModel.findOne({ root: interaction.guild.id });
+        var root = await RootModel.findOne({ guildId: interaction.guild.id });
         root.roleDemandeur=roleDemandeur.id;
         root.roleSupport=roleSupport.id;
         root.save();
